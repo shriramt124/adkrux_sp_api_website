@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amazon SP-API Gateway</title>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
+    <style>
+        :root {
+            --bg-base: #0f111a;
+            --bg-surface: #1E2130;
+            --bg-surface-hover: #26293A;
+            --text-primary: #FFFFFF;
+            --text-secondary: #94A3B8;
+            --accent: #6C5CE7;
+            --accent-hover: #8073EB;
+            --danger: #FF4757;
+            --success: #2ED573;
+            --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+            --border-glass: rgba(255, 255, 255, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-image: radial-gradient(circle at top right, rgba(108, 92, 231, 0.15), transparent 40%),
+                              radial-gradient(circle at bottom left, rgba(46, 213, 115, 0.1), transparent 40%);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        header {
+            text-align: center;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 3rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            background: linear-gradient(135deg, #FFF 0%, #A5B4FC 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        p.subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .card {
+            background: rgba(30, 33, 48, 0.6);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--shadow-glass);
+        }
+
+        /* File Upload */
+        .file-dropzone {
+            border: 2px dashed var(--accent);
+            border-radius: 12px;
+            padding: 3rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(108, 92, 231, 0.05);
+            margin-bottom: 1.5rem;
+        }
+        .file-dropzone:hover {
+            background: rgba(108, 92, 231, 0.1);
+        }
+        .file-dropzone.active {
+            border-color: var(--success);
+            background: rgba(46, 213, 115, 0.05);
+        }
+        
+        .file-input-hidden {
+            display: none;
+        }
+
+        /* Checkboxes */
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: var(--bg-surface);
+            padding: 1rem;
+            border-radius: 10px;
+            border: 1px solid var(--border-glass);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .checkbox-wrapper:hover {
+            background: var(--bg-surface-hover);
+        }
+
+        input[type="checkbox"] {
+            width: 1.25rem;
+            height: 1.25rem;
+            accent-color: var(--accent);
+            cursor: pointer;
+        }
+
+        /* Button */
+        button.action-btn {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 10px;
+            background: var(--accent);
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.1s ease;
+            font-family: 'Outfit', sans-serif;
+            letter-spacing: 0.5px;
+        }
+        button.action-btn:hover {
+            background: var(--accent-hover);
+        }
+        button.action-btn:active {
+            transform: scale(0.98);
+        }
+        button.action-btn:disabled {
+            background: var(--bg-surface);
+            color: var(--text-secondary);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Terminal Window */
+        .terminal {
+            background: #0f111a;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            border: 1px solid var(--border-glass);
+            height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            white-space: pre-wrap;
+            font-size: 0.9rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .log-info { color: #A5B4FC; }
+        .log-success { color: var(--success); }
+        .log-error { color: var(--danger); }
+        .log-complete { color: #F1C40F; font-weight: bold; }
+
+        /* Account Type Toggler */
+        .account-toggle-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            background: var(--bg-surface);
+            border-radius: 50px;
+            padding: 0.4rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-glass);
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .toggle-btn {
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            font-family: 'Outfit', sans-serif;
+        }
+        .toggle-btn.active-seller {
+            background: var(--accent);
+            color: white;
+        }
+        .toggle-btn.active-vendor {
+            background: linear-gradient(135deg, #f7971e, #ffd200);
+            color: #1a1a1a;
+        }
+
+        /* Information Panel */
+        .info-card {
+            background: rgba(30, 33, 48, 0.4);
+            border: 1px dashed var(--border-glass);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .info-card h4 {
+            color: #A5B4FC;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.2rem;
+        }
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        .info-table th, .info-table td {
+            text-align: left;
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--border-glass);
+        }
+        .info-table th {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+        .code-pill {
+            background: rgba(108, 92, 231, 0.2);
+            color: #A5B4FC;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+        }
+        
+    </style>
+</head>
+<body>
+    <div id="root" class="container"></div>
+
+    <script type="text/babel">
+        const { useState, useRef, useEffect } = React;
+
+        function App() {
+            const [file, setFile] = useState(null);
+            const [isDragging, setIsDragging] = useState(false);
+            const [isProcessing, setIsProcessing] = useState(false);
+            const [logs, setLogs] = useState([]);
+            const [accountType, setAccountType] = useState("seller");
+            
+            const [flags, setFlags] = useState({
+                search_terms: true,
+                title: false,
+                description: false,
+                bullet_points: false,
+                main_image: false,
+                lifestyle_images: false,
+                why_choose_us_image: false,
+                dry_run: true
+            });
+
+            const terminalRef = useRef(null);
+
+            // Auto-scroll terminal
+            useEffect(() => {
+                if (terminalRef.current) {
+                    terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
+                }
+            }, [logs]);
+
+            const fileInputRef = useRef(null);
+
+            const handleFileDrop = (e) => {
+                e.preventDefault();
+                setIsDragging(false);
+                if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                    setFile(e.dataTransfer.files[0]);
+                }
+            };
+
+            const handleFileSelect = (e) => {
+                if (e.target.files && e.target.files.length > 0) {
+                    setFile(e.target.files[0]);
+                }
+            };
+
+            const toggleFlag = (key) => {
+                setFlags(prev => ({ ...prev, [key]: !prev[key] }));
+            };
+
+            const addLog = (entry) => {
+                setLogs(prev => [...prev, entry]);
+            };
+
+            const startProcessing = async () => {
+                if (!file) {
+                    alert("Please select a file first.");
+                    return;
+                }
+                
+                setIsProcessing(true);
+                setLogs([]);
+                addLog({ type: 'info', message: 'Initializing connection to gateway...' });
+
+                try {
+                    const formData = new FormData();
+                    formData.append("file", file);
+                    formData.append("flags", JSON.stringify(flags));
+                    formData.append("account_type", accountType);
+
+                    // Use Fetch streaming to read SSE chunks directly from the POST response
+                    const response = await fetch("/api/process", {
+                        method: "POST",
+                        body: formData
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Server returned ${response.status}`);
+                    }
+
+                    const reader = response.body.getReader();
+                    const decoder = new TextDecoder("utf-8");
+                    
+                    let buffer = "";
+
+                    while (true) {
+                        const { done, value } = await reader.read();
+                        if (done) break;
+                        
+                        buffer += decoder.decode(value, { stream: true });
+                        const parts = buffer.split("\n\n");
+                        
+                        // Keep last part in buffer if incomplete
+                        buffer = parts.pop();
+
+                        for (const part of parts) {
+                            if (part.startsWith("data: ")) {
+                                try {
+                                    const payload = JSON.parse(part.replace("data: ", ""));
+                                    addLog(payload);
+                                } catch(e) {
+                                    console.error("Parse error:", e);
+                                }
+                            }
+                        }
+                    }
+                    
+                } catch (error) {
+                    addLog({ type: 'error', message: `Request failed: ${error.message}` });
+                } finally {
+                    setIsProcessing(false);
+                }
+            };
+
+            return (
+                <React.Fragment>
+                    <header>
+                        <h1>SP-API Gateway</h1>
+                        <p className="subtitle">Real-time Amazon Listing Updater</p>
+                    </header>
+
+                    <div className="card">
+
+                        {/* Account Type Toggler */}
+                        <div className="account-toggle-wrapper">
+                            <button
+                                className={`toggle-btn ${accountType === 'seller' ? 'active-seller' : ''}`}
+                                onClick={() => setAccountType('seller')}
+                            >
+                                🏪 Seller Central
+                            </button>
+                            <button
+                                className={`toggle-btn ${accountType === 'vendor' ? 'active-vendor' : ''}`}
+                                onClick={() => setAccountType('vendor')}
+                            >
+                                🏭 Vendor Central
+                            </button>
+                        </div>
+
+                        <div className="info-card">
+                            <h4>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                </svg>
+                                Upload Requirements
+                            </h4>
+                            <p style={{marginBottom: "1rem", fontSize: "0.95rem"}}>Your Excel (.xlsx) file must contain the core identifiers <span className="code-pill">sku</span> (or ASIN) and <span className="code-pill">Country</span>. Based on the toggles you check below, the platform retrieves data from these exact columns:</p>
+                            <table className="info-table">
+                                <thead>
+                                    <tr>
+                                        <th>Attribute</th>
+                                        <th>Required Excel Column Header</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>Backend Search Terms</td><td><span className="code-pill">search terms</span></td></tr>
+                                    <tr><td>Product Title</td><td><span className="code-pill">rcm title</span></td></tr>
+                                    <tr><td>Description</td><td><span className="code-pill">descrp</span></td></tr>
+                                    <tr><td>Bullet Points</td><td><span className="code-pill">rcm kf1</span> through <span className="code-pill">rcm kf5</span></td></tr>
+                                    <tr><td>Main Image</td><td><span className="code-pill">main_image</span> (must be public URLs)</td></tr>
+                                    <tr><td>Lifestyle Images</td><td><span className="code-pill">lifestyle_image_1</span> through <span className="code-pill">_8</span> (public URLs)</td></tr>
+                                    <tr><td>Why Choose Us Image (Slot 2)</td><td><span className="code-pill">why_choose_us_image</span> (public URL; always placed in slot 2)</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div 
+                            className={`file-dropzone ${file ? 'active' : ''}`}
+                            onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                            onDragLeave={() => setIsDragging(false)}
+                            onDrop={handleFileDrop}
+                            onClick={() => fileInputRef.current.click()}
+                        >
+                            <input 
+                                type="file" 
+                                className="file-input-hidden" 
+                                ref={fileInputRef} 
+                                onChange={handleFileSelect}
+                                accept=".xlsx"
+                            />
+                            {file ? (
+                                <div style={{ color: 'var(--success)' }}>
+                                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{marginBottom: '1rem'}}>
+                                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                    </svg>
+                                    <h3>{file.name}</h3>
+                                    <p style={{fontSize: '0.9rem', marginTop: '0.5rem', color: 'var(--text-secondary)'}}>Ready to process</p>
+                                </div>
+                            ) : (
+                                <div>
+                                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2" style={{marginBottom: '1rem'}}>
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                        <polyline points="17 8 12 3 7 8"></polyline>
+                                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                                    </svg>
+                                    <h3>Drop your Excel file here</h3>
+                                    <p style={{fontSize: '0.9rem', marginTop: '0.5rem', color: 'var(--text-secondary)'}}>or click to browse (.xlsx)</p>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="controls-grid">
+                            <label className="checkbox-wrapper">
+                                <input type="checkbox" checked={flags.search_terms} onChange={() => toggleFlag('search_terms')} />
+                                Backend Search Terms
+                            </label>
+                            <label className="checkbox-wrapper">
+                                <input type="checkbox" checked={flags.title} onChange={() => toggleFlag('title')} />
+                                Product Title
+                            </label>
+                            <label className="checkbox-wrapper">
+                                <input type="checkbox" checked={flags.description} onChange={() => toggleFlag('description')} />
+                                Description
+                            </label>
+                            <label className="checkbox-wrapper">
+                                <input type="checkbox" checked={flags.bullet_points} onChange={() => toggleFlag('bullet_points')} />
+                                Bullet Points
+                            </label>
+                            <label className="checkbox-wrapper">
+                                <input type="checkbox" checked={flags.main_image} onChange={() => toggleFlag('main_image')} />
+                                Main Image
+                            </label>
+                            <label className="checkbox-wrapper">
+                                <input type="checkbox" checked={flags.lifestyle_images} onChange={() => toggleFlag('lifestyle_images')} />
+                                Lifestyle Images
+                            </label>
+                            <label className="checkbox-wrapper">
+                                <input type="checkbox" checked={flags.why_choose_us_image} onChange={() => toggleFlag('why_choose_us_image')} />
+                                Why Choose Us Image (Slot 2)
+                            </label>
+                            <label className="checkbox-wrapper" style={{borderColor: 'var(--success)'}}>
+                                <input type="checkbox" checked={flags.dry_run} onChange={() => toggleFlag('dry_run')} />
+                                <strong>DRY RUN MODE</strong>
+                            </label>
+                        </div>
+
+                        <button 
+                            className="action-btn" 
+                            onClick={startProcessing}
+                            disabled={!file || isProcessing}
+                        >
+                            {isProcessing ? "TRANSMITTING TO SP-API..." : "DEPLOY TO AMAZON"}
+                        </button>
+                    </div>
+
+                    {logs.length > 0 && (
+                        <div className="terminal" ref={terminalRef}>
+                            {logs.map((log, i) => {
+                                let content = "";
+                                if (log.type === 'info') content = `[INFO] ${log.message}`;
+                                else if (log.type === 'success') {
+                                    content = `✅ [${log.sku}] SUCCESS`;
+                                    if (log.response) {
+                                        content += `\n  ↳ Response Data: ${JSON.stringify(log.response, null, 2)}`;
+                                    }
+                                }
+                                else if (log.type === 'error') content = `❌ [${log.sku || 'SYSTEM'}] ERROR: ${log.message}`;
+                                else if (log.type === 'complete') content = `🎯 ${log.message}`;
+
+                                return <div key={i} className={`log-${log.type}`}>{content}</div>
+                            })}
+                        </div>
+                    )}
+                </React.Fragment>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

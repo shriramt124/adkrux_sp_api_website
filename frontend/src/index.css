@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-white text-gray-900 antialiased;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+  * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center gap-2 px-5 py-2.5 bg-gray-950 hover:bg-gray-800 text-white text-sm font-semibold rounded-lg transition-all duration-200;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center gap-2 px-5 py-2.5 bg-white hover:bg-gray-50 text-gray-900 text-sm font-semibold rounded-lg border border-gray-300 transition-all duration-200;
+  }
+  .card {
+    @apply bg-white border border-gray-200 rounded-2xl shadow-sm;
+  }
+  .input-field {
+    @apply w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-sm text-gray-900 placeholder-gray-400
+           focus:outline-none focus:border-gray-500 focus:ring-2 focus:ring-gray-200 transition-all;
+  }
+  .select-field {
+    @apply w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-sm text-gray-900
+           focus:outline-none focus:border-gray-500 focus:ring-2 focus:ring-gray-200 transition-all appearance-none cursor-pointer;
+  }
+  .badge {
+    @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold;
+  }
+  .badge-blue  { @apply badge bg-blue-50 text-blue-700 border border-blue-100; }
+  .badge-green { @apply badge bg-emerald-50 text-emerald-700 border border-emerald-100; }
+  .badge-amber { @apply badge bg-amber-50 text-amber-700 border border-amber-100; }
+}

@@ -1,0 +1,21 @@
+{
+  "version": "1",
+  "clients": [
+    {
+      "id": "demo",
+      "name": "Demo Client",
+      "seller": {
+        "default_seller_id": "A1EXAMPLESELLER",
+        "lwa_client_id": "amzn1.application-oa2-client.xxxxx",
+        "lwa_client_secret": "amzn1.oa2-cs.v1.xxxxx",
+        "lwa_refresh_token": "Atzr|IwEBIxxxxx"
+      },
+      "vendor": {
+        "default_vendor_code": "3O93D",
+        "vendor_client_id": "amzn1.application-oa2-client.xxxxx",
+        "vendor_client_secret": "amzn1.oa2-cs.v1.xxxxx",
+        "vendor_refresh_token": "Atzr|IwEBIxxxxx"
+      }
+    }
+  ]
+}
