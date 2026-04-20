@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import Logo from '../components/Logo';
-import { apiFetch } from '../lib/api';
+import { apiFetch, setAdminToken } from '../lib/api';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -22,6 +22,8 @@ export default function Login() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data?.detail || 'Login failed');
+
+      if (data?.token) setAdminToken(data.token);
       navigate('/dashboard');
     } catch (err) {
       setError(err.message);

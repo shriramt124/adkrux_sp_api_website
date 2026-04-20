@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import Logo from './Logo';
-import { apiFetch } from '../lib/api';
+import { apiFetch, clearAdminToken } from '../lib/api';
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -15,6 +15,7 @@ export default function Navbar() {
     try {
       await apiFetch('/api/auth/logout', { method: 'POST' });
     } catch {}
+    clearAdminToken();
     setAuth({ loading: false, ok: false });
     navigate('/login');
   };
