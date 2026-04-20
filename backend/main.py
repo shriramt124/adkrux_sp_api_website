@@ -26,16 +26,21 @@ logging.basicConfig(level=logging.INFO)
 
 app = FastAPI()
 
+cors_origins = [
+    o.strip()
+    for o in os.getenv(
+        "CORS_ORIGINS",
+        "http://127.0.0.1:5173,http://localhost:5173,http://127.0.0.1:8000,http://localhost:8000,https://adkrux-sp-api-website.vercel.app",
+    ).split(",")
+    if o.strip()
+]
+cors_origin_regex = (os.getenv("CORS_ORIGIN_REGEX", "").strip() or None)
+
 app.add_middleware(
     CORSMiddleware,
     # Cookie auth requires explicit origins when allow_credentials=True.
-    allow_origins=[
-        o.strip() for o in os.getenv(
-            "CORS_ORIGINS",
-            "http://127.0.0.1:5173,http://localhost:5173,http://127.0.0.1:8000,http://localhost:8000",
-        ).split(",")
-        if o.strip()
-    ],
+    allow_origins=cors_origins,
+    allow_origin_regex=cors_origin_regex,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

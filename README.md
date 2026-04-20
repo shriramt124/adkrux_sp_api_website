@@ -119,6 +119,26 @@ npm run dev
 http://localhost:5173
 ```
 
+## Production (Vercel frontend)
+
+Frontend is hosted at `https://adkrux-sp-api-website.vercel.app/`.
+
+To make login (cookie auth) work cross-domain, set these **backend** env vars in your hosting provider:
+
+- `CORS_ORIGINS=https://adkrux-sp-api-website.vercel.app`
+	- You can also include dev origins if you want: `http://localhost:5173,http://127.0.0.1:5173,...`
+- `ADMIN_COOKIE_SECURE=true` (required for HTTPS)
+- `ADMIN_COOKIE_SAMESITE=none` (required when frontend and backend are on different domains)
+
+Optional (if you use Vercel preview URLs):
+
+- `CORS_ORIGIN_REGEX=https://.*\.vercel\.app`
+
+Frontend API calls:
+
+- By default, production frontend calls `https://api-spi.fastapicloud.dev`.
+- Override with `VITE_API_BASE_URL` in Vercel env vars if your backend URL changes.
+
 ## How to Use the UI
 1. **Prepare your Data:** Drag your Cloudinary-processed Excel file (`-cloud.xlsx`) into the dotted drop zone in the browser.
 2. **Select Attributes:** Check the boxes for exactly what fields you wish to update on Amazon (Title, Description, Images, etc).
