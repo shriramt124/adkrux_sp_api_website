@@ -75,12 +75,32 @@ def get_cookie_name() -> str:
     return os.getenv("ADMIN_COOKIE_NAME", _COOKIE_NAME)
 
 
+def _get_bearer_token(req: Request) -> Optional[str]:
+    auth = (req.headers.get("authorization") or "").strip()
+    if not auth:
+        return None
+    parts = auth.split(None, 1)
+    if len(parts) != 2:
+        return None
+    scheme, token = parts[0].strip(), parts[1].strip()
+    if scheme.lower() != "bearer" or not token:
+        return None
+    return token
+
+
 def is_admin_request(req: Request) -> bool:
     cookie_name = get_cookie_name()
-    token = req.cookies.get(cookie_name)
-    if not token:
-        return False
-    return verify_session_token(token, secret=get_admin_session_secret())
+    secret = get_admin_session_secret()
+
+    cookie_token = (req.cookies.get(cookie_name) or "").strip()
+    if cookie_token and verify_session_token(cookie_token, secret=secret):
+        return True
+
+    bearer_token = _get_bearer_token(req)
+    if bearer_token and verify_session_token(bearer_token, secret=secret):
+        return True
+
+    return False
 
 
 def require_admin(req: Request) -> None:

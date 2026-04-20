@@ -74,7 +74,7 @@ async def login(req: LoginRequest):
     # We implement this as a long-lived cookie (10 years) rather than a short TTL.
     cookie_max_age_s = 10 * 365 * 24 * 3600
     token = issue_session_token(secret=get_admin_session_secret(), ttl_s=cookie_max_age_s)
-    resp = JSONResponse({"ok": True})
+    resp = JSONResponse({"ok": True, "token": token})
     resp.set_cookie(
         key=get_cookie_name(),
         value=token,
