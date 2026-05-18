@@ -55,7 +55,11 @@ class CredentialStore:
     def reload(self) -> None:
         text = self._load_config_text()
         self._config_sha256 = hashlib.sha256(text.encode("utf-8")).hexdigest()
-        data = json.loads(text)
+        
+        # Clean trailing commas to prevent strict json.loads from failing
+        import re
+        clean_text = re.sub(r',\s*([\]}])', r'\1', text)
+        data = json.loads(clean_text)
 
         clients_in: List[Dict[str, Any]] = data.get("clients") or []
         out: Dict[str, ClientConfig] = {}
