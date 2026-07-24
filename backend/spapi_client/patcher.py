@@ -252,6 +252,19 @@ class SpApiPatcher:
             if response.status_code in [200, 202]:
                 try:
                     resp_data = response.json()
+                    issues = resp_data.get("issues", [])
+                    errors = [i for i in issues if i.get("severity") == "ERROR"]
+                    
+                    if errors:
+                        err_msgs = " | ".join([f"{e.get('message', '')}" for e in errors])
+                        logger.error(f"[ERROR] Amazon Accepted Request BUT found issues for {sku}: {err_msgs}")
+                        return False, f"Amazon Validation Failed: {err_msgs}"
+                        
+                    if issues:
+                        warnings = " | ".join([f"{e.get('message', '')}" for e in issues if e.get("severity") != "ERROR"])
+                        logger.warning(f"PATCH Success for {sku} but with warnings: {warnings}")
+                        return True, f"Success (with warnings: {warnings})"
+                        
                     logger.info(f"PATCH Success for {sku}. Response: {json.dumps(resp_data)}")
                 except Exception:
                     resp_data = response.text
